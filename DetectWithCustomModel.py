@@ -5,11 +5,36 @@ import pickle
 import pandas as pd
 
 
-# modelFileName = "body_language.pkl"
-modelFileName = "KMU.pkl"
+def renderHolistic(mp_drawing, mp_holistic, results):
+    # 1. Draw face landmarks
+    mp_drawing.draw_landmarks(image, results.face_landmarks, mp_holistic.FACE_CONNECTIONS,
+                              mp_drawing.DrawingSpec(color=(80, 110, 10), thickness=1, circle_radius=1),
+                              mp_drawing.DrawingSpec(color=(80, 256, 121), thickness=1, circle_radius=1)
+                              )
+
+    # 2. Right hand
+    mp_drawing.draw_landmarks(image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS,
+                              mp_drawing.DrawingSpec(color=(80, 22, 10), thickness=2, circle_radius=4),
+                              mp_drawing.DrawingSpec(color=(80, 44, 121), thickness=2, circle_radius=2)
+                              )
+
+    # 3. Left Hand
+    mp_drawing.draw_landmarks(image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS,
+                              mp_drawing.DrawingSpec(color=(121, 22, 76), thickness=2, circle_radius=4),
+                              mp_drawing.DrawingSpec(color=(121, 44, 250), thickness=2, circle_radius=2)
+                              )
+
+    # 4. Pose Detections
+    mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS,
+                              mp_drawing.DrawingSpec(color=(245, 117, 66), thickness=2, circle_radius=4),
+                              mp_drawing.DrawingSpec(color=(245, 66, 230), thickness=2, circle_radius=2)
+                              )
+
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
+    modelFileName = input("Write Model File: ")
+
     with open(modelFileName, 'rb') as f:
         global model
         model = pickle.load(f)
@@ -26,40 +51,18 @@ if __name__ == '__main__':
 
             # Recolor Feed
             image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            # Make Detections
-            global results
-            results = holistic.process(image)
 
+            # Make Detections
             # face_landmarks, pose_landmarks, left_hand_landmarks, right_hand_landmarks
+            results = holistic.process(image)
 
             # Recolor image back to BGR for rendering
             image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
-            # 1. Draw face landmarks
-            mp_drawing.draw_landmarks(image, results.face_landmarks, mp_holistic.FACE_CONNECTIONS,
-                                      mp_drawing.DrawingSpec(color=(80, 110, 10), thickness=1, circle_radius=1),
-                                      mp_drawing.DrawingSpec(color=(80, 256, 121), thickness=1, circle_radius=1)
-                                      )
-
-            # 2. Right hand
-            mp_drawing.draw_landmarks(image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS,
-                                      mp_drawing.DrawingSpec(color=(80, 22, 10), thickness=2, circle_radius=4),
-                                      mp_drawing.DrawingSpec(color=(80, 44, 121), thickness=2, circle_radius=2)
-                                      )
-
-            # 3. Left Hand
-            mp_drawing.draw_landmarks(image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS,
-                                      mp_drawing.DrawingSpec(color=(121, 22, 76), thickness=2, circle_radius=4),
-                                      mp_drawing.DrawingSpec(color=(121, 44, 250), thickness=2, circle_radius=2)
-                                      )
-
-            # 4. Pose Detections
-            mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS,
-                                      mp_drawing.DrawingSpec(color=(245, 117, 66), thickness=2, circle_radius=4),
-                                      mp_drawing.DrawingSpec(color=(245, 66, 230), thickness=2, circle_radius=2)
-                                      )
-
             try:
+                # Rendering Face Mesh and Pose (Mediapipe Holistic Solution)
+                renderHolistic(mp_drawing, mp_holistic, results)
+
                 pose = results.pose_landmarks.landmark
                 pose_row = list(np.array([[landmark.x, landmark.y, landmark.z, landmark.visibility] for landmark in pose]).flatten())
 
@@ -100,12 +103,12 @@ if __name__ == '__main__':
                             cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
 
             except:
-                cv2.imshow('Raw Webcam Feed', image)
-                continue
+                print("Holistic Detection Fail")
 
             cv2.imshow('Raw Webcam Feed', image)
 
             if cv2.waitKey(10) & 0xFF == ord('q'):
+                print("finish")
                 break
 
     cap.release()
