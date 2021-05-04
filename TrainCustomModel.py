@@ -11,7 +11,7 @@ from sklearn.metrics import accuracy_score
 import pickle
 
 
-modelFileName = "mymy.pkl"
+modelFileName = "DriverRecognition.pkl"
 
 if __name__ == '__main__':
     df = pd.read_csv('coords.csv')
