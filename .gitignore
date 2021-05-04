@@ -1,0 +1,5 @@
+coords backup/
+model backup/
+venv/
+
+.DS_Store
