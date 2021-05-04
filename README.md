@@ -7,6 +7,9 @@
 Mediapipe 와 scikit-learn 프레임워크를 활용하여
 운전자가 주행보조기능에 의존하지 않는지 확인해주는 기능을 구현하고자합니다.
 
+## Youtube 
+- [설명 동영상](https://youtu.be/8zpVKjGNLM8)
+
 ## Environment
 - Interpreter: Python 3.9
 
